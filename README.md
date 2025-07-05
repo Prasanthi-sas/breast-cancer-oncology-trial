@@ -1,4 +1,32 @@
+ Breast Cancer Oncology Clinical Trial – SDTM Mapping (Phase I Study)
 
+1.Study Overview
+Title: Phase I, Open-Label, Multi-Center Oncology Trial
+Objective: Evaluate safety and tumor response to an investigational drug in patients with solid tumors.
+Therapeutic Area: Oncology – Focus on Breast Cancer
+Design: Non-randomized, early-phase study
+
+2. Project Folder Structure
+Folder	          Description
+raw_data/	Raw Excel files (e.g. DM.xlsx, TU.xlsx)
+specs/	        Mapping specifications for SDTM
+sas_code/	SAS code for transforming CDM to SDTM
+output/	        Final SDTM datasets (DM, TU, TR, RS)
+README.md	Project explanation
+
+
+3. Breast cancer is one of the most common and impactful cancers affecting women worldwide. In oncology clinical trials, especially early-phase studies, it is crucial to accurately monitor and evaluate tumor progression. This includes identifying tumor sites, measuring tumor size over time, and assessing response to treatment.
+
+To ensure consistent reporting across studies, CDISC SDTM standards provide dedicated tumor-related domains:
+TU (Tumor Identification) – Tracks the anatomical locations of tumors.
+TR (Tumor Measurements) – Captures tumor size (e.g., diameter) at specific time points.
+RS (Tumor Response) – Evaluates how tumors respond to therapy using categories such as Complete Response (CR), Partial Response (PR), Stable Disease (SD), or Progressive Disease (PD), often based on RECIST criteria.
+
+These domains ensure data traceability from initial tumor identification through to response assessment, enabling regulatory-compliant and submission-ready datasets for oncology studies.
+
+
+
+step 1: Import the Data:-
 
 PROC IMPORT DATAFILE="C:\Users\ashok pc\OneDrive\Desktop\SDTMIG Guidelines\clinical_project_-_part_1\Clinical Project - Part 1\Data\Data_excel\CDM\DEATH.xlsx" 
             DBMS=XLSX 
@@ -41,26 +69,20 @@ PROC IMPORT DATAFILE="C:\Users\ashok pc\OneDrive\Desktop\SDTMIG Guidelines\clini
 			RUN;
 
 
-
-
 SETUP CODE:;
 
 options mprint mlogic;
-
-/*Step 1: Change this to where the unzipped folder located in ur PC*/
 %let Root = /folders/myfolders/Clinical Project - Part 1;
 
+Step 2: Creating libraries:-
 
-
-/*Step 2: Creating libraries*/
  libname CDM  "&root./data/data_sas/CDM";
  libname SDTM "&root./data/data_sas/SDTM";
  libname ADAM "&root./data/data_sas/ADAM";
 
 
 
-/*Step 3: Creating sas data sets*/
-
+Step 3: Creating sas data sets
  /*CDM datasets*/
 
 %macro CDM (Domain= ) ;
@@ -116,10 +138,22 @@ proc copy in=work out=sdtm;
 select Ta;
 run;
 
+5. SDTM Domain Derivation Logic
+1.DM Domain
+Derived USUBJID, RFSTDTC, RFENDTC, ARMCD, etc.
+Mapped death data from DEATH domain
+Merged treatment exposure from EX domain
 
+2.TU Domain – Tumor Identification
+Created TULINKID, TUTESTCD, TUSEQ
 
+3.TR Domain – Tumor Measurements
+Derived TRTESTCD, TRORRES, TRSTRESC
+Sequenced with TRSEQ
 
-
+4.RS Domain – Tumor Response
+Based on RESPONSE in RS data
+Created RSSEQ, RSLINKID
 
 
 
